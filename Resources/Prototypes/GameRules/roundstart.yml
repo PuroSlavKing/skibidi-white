@@ -87,9 +87,7 @@
       components:
       - type: NukeOperative
       - type: RandomMetadata
-        nameSegments:
-        - nukeops-role-commander
-        - SyndicateNamesElite
+        nameSegments: [ names_death_commando ] # goob edit
       - type: NpcFactionMember
         factions:
         - Syndicate
@@ -103,9 +101,7 @@
       components:
       - type: NukeOperative
       - type: RandomMetadata
-        nameSegments:
-        - nukeops-role-agent
-        - SyndicateNamesNormal
+        nameSegments: [ names_death_commando ] # goob edit
       - type: NpcFactionMember
         factions:
         - Syndicate
@@ -121,9 +117,7 @@
       components:
       - type: NukeOperative
       - type: RandomMetadata
-        nameSegments:
-        - nukeops-role-operator
-        - SyndicateNamesNormal
+        nameSegments: [ names_death_commando ] # goob edit
       - type: NpcFactionMember
         factions:
         - Syndicate
@@ -224,6 +218,41 @@
         prototype: InitialInfected
 
 # event schedulers
+
+# goob edit - separate event schedulers
+- type: entityTable
+  id: BasicGameRulesTable
+  table: !type:AllSelector # we need to pass a list of rules, since rules have further restrictions to consider via StationEventComp
+    children:
+      - !type:NestedSelector
+        tableId: BasicCalmEventsTable
+      - !type:NestedSelector
+        tableId: CargoGiftsTable
+      - !type:NestedSelector
+        tableId: CalmPestEventsTable
+      - !type:NestedSelector
+        tableId: SpicyPestEventsTable
+
+- type: entityTable
+  id: AllGameRulesTable
+  table: !type:AllSelector
+    children:
+    - !type:NestedSelector
+      tableId: BasicGameRulesTable
+    - !type:NestedSelector
+      tableId: BasicAntagEventsTable
+
+- type: entityTable
+  id: SpaceTrafficControlTable
+  table: !type:AllSelector # we need to pass a list of rules, since rules have further restrictions to consider via StationEventComp
+    children:
+      - !type:NestedSelector
+        tableId: UnknownShuttlesFriendlyTable
+      - !type:NestedSelector
+        tableId: UnknownShuttlesFreelanceTable
+      - !type:NestedSelector
+        tableId: UnknownShuttlesHostileTable
+
 - type: entity
   id: BasicStationEventScheduler
   parent: BaseGameRule
@@ -232,11 +261,22 @@
   - type: BasicStationEventScheduler
 
 - type: entity
+  id: AntagStationEventScheduler
+  parent: BaseGameRule
+  components:
+  - type: BasicStationEventScheduler
+    scheduledGameRules: !type:NestedSelector
+      tableId: BasicAntagEventsTable
+
+- type: entity
   id: RampingStationEventScheduler
   parent: BaseGameRule
   categories: [ HideSpawnMenu ]
   components:
   - type: RampingStationEventScheduler
+    scheduledGameRules: !type:NestedSelector
+      tableId: AllGameRulesTable
+# goob edit end
 
 - type: entity
   id: HellshiftStationEventScheduler

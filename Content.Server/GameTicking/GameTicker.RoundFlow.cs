@@ -837,5 +837,11 @@ namespace Content.Server.GameTicking
             Text += text;
             _doNewLine = true;
         }
+
+        // goob edit
+        public void AppendAtStart(string text)
+        {
+            Text = text + Text;
+        }
     }
 }

@@ -1,0 +1,166 @@
+# major antags that get picked once during roundstart.
+# the max number of antags is so small because it's used for midround events too.
+# regards.
+
+# Traitor
+- type: entity
+  parent: BaseTraitorRuleDynamic
+  id: TraitorDynamic
+  components:
+  - type: DynamicRuleset
+    nameLoc: dynamic-gamerule-traitor-title
+    weight: 5
+    cost: 8
+    scalingCost: 9
+  - type: AntagSelection
+    definitions:
+    - prefRoles: [ Traitor ]
+      max: 2
+      playerRatio: 10
+      blacklist:
+        components:
+        - AntagImmune
+      lateJoinAdditional: true
+      mindComponents:
+      - type: TraitorRole
+        prototype: Traitor
+
+# Thief (Spy wyci)
+- type: entity
+  parent: BaseGameRuleDynamic
+  id: ThiefDynamic
+  components:
+  - type: DynamicRuleset
+    nameLoc: dynamic-gamerule-thief-title
+    weight: 5
+    cost: 8
+    scalingCost: 9
+  - type: ThiefRule
+  - type: AntagObjectives
+    objectives:
+    - EscapeThiefShuttleObjective
+  - type: AntagRandomObjectives
+    sets:
+    - groups: ThiefBigObjectiveGroups
+      prob: 0.7
+      maxPicks: 1
+    - groups: ThiefObjectiveGroups
+      maxPicks: 10
+    maxDifficulty: 2.5
+  - type: AntagSelection
+    agentName: thief-round-end-agent-name
+    definitions:
+    - prefRoles: [ Thief ]
+      max: 2
+      playerRatio: 15
+      lateJoinAdditional: true
+      allowNonHumans: true
+      multiAntagSetting: NotExclusive
+      startingGear: ThiefGear
+      mindComponents:
+      - type: ThiefRole
+        prototype: Thief
+      briefing:
+        sound: "/Audio/Misc/thief_greeting.ogg"
+
+# Revolution
+- type: entity
+  id: RevolutionDynamic
+  parent: BaseGameRuleDynamic
+  components:
+  - type: DynamicRuleset
+    nameLoc: dynamic-gamerule-revolutionary-title
+    weight: 3
+    cost: 20
+    highImpact: true
+  - type: RevolutionaryRule
+  - type: GameRule
+    minPlayers: 20
+  - type: AntagSelection
+    definitions:
+    - prefRoles: [ HeadRev ]
+      max: 2
+      playerRatio: 15
+      blacklist:
+        components:
+        - AntagImmune
+        - CommandStaff
+      briefing:
+        text: head-rev-role-greeting
+        color: CornflowerBlue
+        sound: "/Audio/Ambience/Antag/headrev_start.ogg"
+      startingGear: HeadRevGear
+      components:
+      - type: Revolutionary
+      - type: HeadRevolutionary
+      mindComponents:
+      - type: RevolutionaryRole
+        prototype: HeadRev
+
+# NukeOps
+- type: entity
+  parent: BaseNukeopsRuleDynamic
+  id: NukeopsDynamic
+  components:
+  - type: DynamicRuleset
+    nameLoc: dynamic-gamerule-nukeops-title
+    weight: 3
+    cost: 20
+    highImpact: true
+  - type: GameRule
+    minPlayers: 25
+  - type: LoadMapRule
+    mapPath: /Maps/_Goobstation/Nonstations/nukieplanet.yml
+  - type: AntagSelection
+    #selectionTime: PrePlayerSpawn
+    definitions:
+    - prefRoles: [ NukeopsCommander ]
+      fallbackRoles: [ Nukeops, NukeopsMedic ]
+      spawnerPrototype: SpawnPointNukeopsCommander
+      startingGear: SyndicateCommanderGearFull
+      roleLoadout:
+      - RoleSurvivalSyndicate
+      components:
+      - type: NukeOperative
+      - type: RandomMetadata
+        nameSegments: [ names_death_commando ]
+      - type: NpcFactionMember
+        factions:
+        - Syndicate
+      mindComponents:
+      - type: NukeopsRole
+        prototype: NukeopsCommander
+    - prefRoles: [ NukeopsMedic ]
+      fallbackRoles: [ Nukeops, NukeopsCommander ]
+      spawnerPrototype: SpawnPointNukeopsMedic
+      startingGear: SyndicateOperativeMedicFull
+      roleLoadout:
+      - RoleSurvivalSyndicate
+      components:
+      - type: NukeOperative
+      - type: RandomMetadata
+        nameSegments: [ names_death_commando ]
+      - type: NpcFactionMember
+        factions:
+        - Syndicate
+      mindComponents:
+      - type: NukeopsRole
+        prototype: NukeopsMedic
+    - prefRoles: [ Nukeops ]
+      fallbackRoles: [ NukeopsCommander, NukeopsMedic ]
+      spawnerPrototype: SpawnPointNukeopsOperative
+      max: 3
+      playerRatio: 10
+      startingGear: SyndicateOperativeGearFull
+      roleLoadout:
+      - RoleSurvivalSyndicate
+      components:
+      - type: NukeOperative
+      - type: RandomMetadata
+        nameSegments: [ names_death_commando ]
+      - type: NpcFactionMember
+        factions:
+        - Syndicate
+      mindComponents:
+      - type: NukeopsRole
+        prototype: Nukeops

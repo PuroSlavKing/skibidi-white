@@ -29,12 +29,18 @@ using Content.Shared.Zombies;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Content.Shared.Cuffs.Components;
+using Content.Shared.Revolutionary;
+using Content.Server.Communications;
+using System.Linq;
+using Content.Shared.Chat;
+using Content.Server.Chat.Systems;
 
 namespace Content.Server.GameTicking.Rules;
 
 /// <summary>
 /// Where all the main stuff for Revolutionaries happens (Assigning Head Revs, Command on station, and checking for the game to end.)
 /// </summary>
+// Heavily edited by goobstation. If you want to upstream something think twice
 public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleComponent>
 {
     [Dependency] private readonly IAdminLogManager _adminLogManager = default!;
@@ -50,6 +56,8 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
     [Dependency] private readonly RoundEndSystem _roundEnd = default!;
     [Dependency] private readonly StationSystem _stationSystem = default!;
     [Dependency] private readonly EmergencyShuttleSystem _emergencyShuttle = default!;
+    [Dependency] private readonly SharedRevolutionarySystem _revolutionarySystem = default!;
+    [Dependency] private readonly ChatSystem _chatSystem = default!;
 
     //Used in OnPostFlash, no reference to the rule component is available
     public readonly ProtoId<NpcFactionPrototype> RevolutionaryNpcFaction = "Revolutionary";
@@ -62,6 +70,7 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
         SubscribeLocalEvent<HeadRevolutionaryComponent, MobStateChangedEvent>(OnHeadRevMobStateChanged);
         SubscribeLocalEvent<RevolutionaryRoleComponent, GetBriefingEvent>(OnGetBriefing);
         SubscribeLocalEvent<HeadRevolutionaryComponent, AfterFlashedEvent>(OnPostFlash);
+        SubscribeLocalEvent<CommunicationConsoleCallShuttleAttemptEvent>(OnTryCallEvac); // Goob
     }
 
     protected override void Started(EntityUid uid, RevolutionaryRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
@@ -73,14 +82,44 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
     protected override void ActiveTick(EntityUid uid, RevolutionaryRuleComponent component, GameRuleComponent gameRule, float frameTime)
     {
         base.ActiveTick(uid, component, gameRule, frameTime);
+
         if (component.CommandCheck <= _timing.CurTime)
         {
             component.CommandCheck = _timing.CurTime + component.TimerWait;
 
+            // goob edit
             if (CheckCommandLose())
             {
-                _roundEnd.DoRoundEndBehavior(RoundEndBehavior.ShuttleCall, component.ShuttleCallTime);
-                GameTicker.EndGameRule(uid, gameRule);
+                if (!component.HasRevAnnouncementPlayed)
+                {
+                    _chatSystem.DispatchGlobalAnnouncement(
+                        Loc.GetString("revolutionaries-win-announcement"),
+                        Loc.GetString("revolutionaries-win-sender"),
+                        colorOverride: Color.Gold);
+
+                    component.HasRevAnnouncementPlayed = true;
+                }
+
+                foreach (var ms in EntityQuery<MindShieldComponent, MobStateComponent>())
+                {
+                    var entity = ms.Item1.Owner;
+
+                    // assign eotrs
+                    if (HasComp<RevolutionEnemyComponent>(entity))
+                        continue;
+                    var revenemy = EnsureComp<RevolutionEnemyComponent>(entity);
+                    _antag.SendBriefing(entity, Loc.GetString("rev-eotr-gain"), Color.Red, revenemy.RevStartSound);
+                }
+            }
+
+            if (CheckRevsLose() && !component.HasAnnouncementPlayed)
+            {
+                _chatSystem.DispatchGlobalAnnouncement(
+                    Loc.GetString("revolutionaries-lose-announcement"),
+                    Loc.GetString("revolutionaries-sender-cc"),
+                    colorOverride: Color.Gold);
+
+                component.HasAnnouncementPlayed = true;
             }
         }
     }
@@ -135,10 +174,14 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
             !HasComp<HumanoidAppearanceComponent>(ev.Target) &&
             !alwaysConvertible ||
             !_mobState.IsAlive(ev.Target) ||
-            HasComp<ZombieComponent>(ev.Target))
+            HasComp<ZombieComponent>(ev.Target)
+            || HasComp<CommandStaffComponent>(ev.Target)) // goob edit - rev no command flashing
         {
             return;
         }
+
+        if (HasComp<RevolutionEnemyComponent>(ev.Target))
+            RemComp<RevolutionEnemyComponent>(ev.Target);
 
         _npcFaction.AddFaction(ev.Target, RevolutionaryNpcFaction);
         var revComp = EnsureComp<RevolutionaryComponent>(ev.Target);
@@ -160,7 +203,8 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
             _antag.SendBriefing(mind.Session, Loc.GetString("rev-role-greeting"), Color.Red, revComp.RevStartSound);
     }
 
-    //TODO: Enemies of the revolution
+    //~~TODO: Enemies of the revolution~~
+    // goob edit: too bad wizden goob did it first :trollface:
     private void OnCommandMobStateChanged(EntityUid uid, CommandStaffComponent comp, MobStateChangedEvent ev)
     {
         if (ev.NewMobState == MobState.Dead || ev.NewMobState == MobState.Invalid)
@@ -234,6 +278,30 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
         }
 
         return false;
+    }
+
+    // goob edit - no shuttle call until internal affairs are figured out
+    private void OnTryCallEvac(ref CommunicationConsoleCallShuttleAttemptEvent ev)
+    {
+        var revs = EntityQuery<RevolutionaryComponent, MobStateComponent>();
+        var revenemies = EntityQuery<RevolutionEnemyComponent, MobStateComponent>();
+        var minds = EntityQuery<MindContainerComponent>();
+
+        var revsNormalized = revs.Count() / (minds.Count() - revs.Count());
+        var enemiesNormalized = revenemies.Count() / (minds.Count() - revenemies.Count());
+
+        // calling evac will result in an error if:
+        // - command is gone & there are more than 35% of enemies
+        // - or if there are more than 35% of revolutionaries
+        // hardcoded values because idk why not
+        // regards
+        if (CheckCommandLose() && enemiesNormalized >= .35f
+        || revsNormalized >= .35f)
+        {
+            ev.Cancelled = true;
+            ev.Reason = Loc.GetString("shuttle-call-error");
+            return;
+        }
     }
 
     /// <summary>

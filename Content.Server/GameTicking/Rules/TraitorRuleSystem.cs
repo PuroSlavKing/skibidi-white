@@ -22,6 +22,12 @@ using System.Text;
 
 namespace Content.Server.GameTicking.Rules;
 
+/// <summary>
+///     Heavily edited.
+///     If you wanna upstream something think twice.
+///     Piras this is directed to you :trollface:
+///     regards.
+/// </summary>
 public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
@@ -81,6 +87,7 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
 
         var briefing = Loc.GetString("traitor-role-codewords-short", ("codewords", string.Join(", ", component.Codewords)));
         var issuer = _random.Pick(_prototypeManager.Index(component.ObjectiveIssuers).Values);
+        component.ObjectiveIssuer = issuer;
 
         if (TryComp<AutoTraitorComponent>(traitor, out var autoTraitorComponent))
         {
@@ -110,14 +117,14 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
                 Loc.GetString("traitor-role-uplink-code-short", ("code", string.Join("-", code).Replace("sharp", "#"))));
         }
 
-        _antag.SendBriefing(traitor, GenerateBriefing(component.Codewords, code, issuer), null, component.GreetSoundNotification);
+        _antag.SendBriefing(traitor, GenerateBriefing(component.Codewords, code, issuer), Color.Crimson, component.GreetSoundNotification);
 
         component.TraitorMinds.Add(mindId);
 
         // Assign briefing
         _roleSystem.MindAddRole(mindId, new RoleBriefingComponent
         {
-            Briefing = briefing
+            Briefing = GenerateBriefingCharacter(component.Codewords, code, issuer)
         }, mind, true);
 
         // Don't Change the faction, this was stupid.
@@ -157,13 +164,41 @@ public sealed class TraitorRuleSystem : GameRuleSystem<TraitorRuleComponent>
         args.Text += "\n" + Loc.GetString("traitor-round-end-codewords", ("codewords", string.Join(", ", comp.Codewords)));
     }
 
-    private string GenerateBriefing(string[] codewords, Note[]? uplinkCode, string? objectiveIssuer = null)
+    // TODO: figure out how to handle this? add priority to briefing event?
+    private string GenerateBriefing(string[] codewords, Note[]? uplinkCode, string objectiveIssuer)
     {
         var sb = new StringBuilder();
-        sb.AppendLine(Loc.GetString("traitor-role-greeting", ("corporation", objectiveIssuer ?? Loc.GetString("objective-issuer-unknown"))));
-        sb.AppendLine(Loc.GetString("traitor-role-codewords-short", ("codewords", string.Join(", ", codewords))));
+        sb.AppendLine("\n" + Loc.GetString($"traitor-{objectiveIssuer}-intro"));
+
         if (uplinkCode != null)
-            sb.AppendLine(Loc.GetString("traitor-role-uplink-code-short", ("code", string.Join("-", uplinkCode).Replace("sharp", "#"))));
+        {
+            sb.AppendLine("\n" + Loc.GetString($"traitor-{objectiveIssuer}-uplink"));
+            sb.AppendLine(Loc.GetString($"traitor-role-uplink-code", ("code", string.Join("-", uplinkCode).Replace("sharp", "#"))));
+        }
+        else sb.AppendLine("\n" + Loc.GetString($"traitor-role-nouplink"));
+
+        sb.AppendLine("\n" + Loc.GetString($"traitor-role-codewords", ("codewords", string.Join(", ", codewords))));
+
+        sb.AppendLine("\n" + Loc.GetString($"traitor-role-moreinfo"));
+
+        return sb.ToString();
+    }
+    private string GenerateBriefingCharacter(string[] codewords, Note[]? uplinkCode, string objectiveIssuer)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("\n" + Loc.GetString($"traitor-{objectiveIssuer}-intro"));
+
+        if (uplinkCode != null)
+            sb.AppendLine(Loc.GetString($"traitor-role-uplink-code-short", ("code", string.Join("-", uplinkCode).Replace("sharp", "#"))));
+        else sb.AppendLine("\n" + Loc.GetString($"traitor-role-nouplink"));
+
+        sb.AppendLine(Loc.GetString($"traitor-role-codewords-short", ("codewords", string.Join(", ", codewords))));
+
+        sb.AppendLine("\n" + Loc.GetString($"traitor-role-allegiances"));
+        sb.AppendLine(Loc.GetString($"traitor-{objectiveIssuer}-allies"));
+
+        sb.AppendLine("\n" + Loc.GetString($"traitor-role-notes"));
+        sb.AppendLine(Loc.GetString($"traitor-{objectiveIssuer}-goal"));
 
         return sb.ToString();
     }
