@@ -378,7 +378,7 @@
     minimumPlayers: 20
     duration: 1
   - type: LoadMapRule
-    mapPath: /Maps/_Goobstation/Nonstations/nukieplanet.yml # goob edit
+    preloadedGrid: ShuttleStriker
   - type: NukeopsRule # goob edit
     roundEndBehavior: Nothing
   - type: AntagSelection
