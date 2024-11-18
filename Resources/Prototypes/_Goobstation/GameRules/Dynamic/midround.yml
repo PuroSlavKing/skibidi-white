@@ -1,15 +1,16 @@
 # same with roundstart, highImpact means it can only be spawned once
 # the only weights that work are in DynamicRuleset
+# Many changes to unfuck it - Funky Station
 
 # Midround Traitors
 - type: entity
-  parent: TraitorDynamic
+  parent: TraitorDynamicLow # shityml but does the job to be fair, better than pre-unfuck
   id: TraitorDynamicMidround
   components:
   - type: DynamicRuleset
     nameLoc: dynamic-gamerule-midround-traitor-title
-    weight: 8
-    cost: 3
+    weight: 30 
+    cost: 9 # Lmao at 3 cost, the average game has 10-30 midgame pretty often
   - type: StationEvent
     earliestStart: 30
     weight: 10
@@ -21,6 +22,46 @@
     occursDuringRoundEnd: false
   - type: AlertLevelInterceptionRule
 
+# Midround Changelings | WWDP-Remove
+#- type: entity
+#  parent: ChangelingDynamicLow
+#  id: ChangelingDynamicMidround
+#  components:
+#  - type: DynamicRuleset
+#    nameLoc: dynamic-gamerule-midround-changeling-title
+#    weight: 15
+#    cost: 12 
+#  - type: StationEvent
+#    earliestStart: 20
+#    weight: 3
+#    minimumPlayers: 15
+#    startAnnouncement: station-event-communication-interception
+#    startAudio:
+#      path: /Audio/Announcements/intercept.ogg
+#    duration: null
+#    occursDuringRoundEnd: false
+#  - type: AlertLevelInterceptionRule
+
+# Midround Heretics | WWDP-Remove
+#- type: entity
+#  parent: HereticDynamicLow
+#  id: HereticDynamicMidround
+#  components:
+#  - type: DynamicRuleset
+#    nameLoc: dynamic-gamerule-midround-heretic-title
+#    weight: 15
+#    cost: 15
+#  - type: StationEvent
+#    earliestStart: 20 
+#    weight: 3 
+#    minimumPlayers: 30
+#    startAnnouncement: station-event-communication-interception
+#    startAudio:
+#      path: /Audio/Announcements/intercept.ogg
+#    duration: null
+#    occursDuringRoundEnd: false
+#  - type: AlertLevelInterceptionRule
+
 # Midround Revolutionaries
 - type: entity
   parent: RevolutionDynamic
@@ -28,8 +69,8 @@
   components:
   - type: DynamicRuleset
     nameLoc: dynamic-gamerule-midround-revolutionary-title
-    weight: 3
-    cost: 7
+    weight: 5
+    cost: 30
     highImpact: true
   - type: StationEvent
     earliestStart: 20 
@@ -46,8 +87,8 @@
   components:
   - type: DynamicRuleset
     nameLoc: dynamic-gamerule-skeleton-title
-    weight: 6
-    cost: 3
+    weight: 20
+    cost: 5
   - type: StationEvent
     weight: 5
     duration: 1
@@ -62,8 +103,8 @@
   components:
   - type: DynamicRuleset
     nameLoc: dynamic-gamerule-dragon-title
-    weight: 4
-    cost: 7
+    weight: 10
+    cost: 15
     highImpact: true
   - type: StationEvent
     weight: 6.5
@@ -97,8 +138,8 @@
   components:
   - type: DynamicRuleset
     nameLoc: dynamic-gamerule-ninja-title
-    weight: 4
-    cost: 7
+    weight: 10
+    cost: 10
     highImpact: true
   - type: StationEvent
     weight: 6
@@ -152,8 +193,8 @@
   components:
   - type: DynamicRuleset
     nameLoc: dynamic-gamerule-revenant-title
-    weight: 4
-    cost: 5
+    weight: 5
+    cost: 7
     highImpact: true
   - type: StationEvent
     weight: 7.5
@@ -170,8 +211,8 @@
   components:
   - type: DynamicRuleset
     nameLoc: dynamic-gamerule-midround-zombies-title
-    weight: 2
-    cost: 10
+    weight: 5
+    cost: 30
     highImpact: true
   - type: StationEvent
     earliestStart: 90
@@ -182,8 +223,8 @@
   - type: AntagSelection
     definitions:
     - prefRoles: [ InitialInfected ]
-      max: 3
-      playerRatio: 10
+      max: 4
+      playerRatio: 15
       blacklist:
         components:
         - ZombieImmune
@@ -210,8 +251,8 @@
   components:
   - type: DynamicRuleset
     nameLoc: dynamic-gamerule-loneop-title
-    weight: 4
-    cost: 7
+    weight: 5
+    cost: 15
     highImpact: true
   - type: StationEvent
     earliestStart: 35
@@ -240,8 +281,8 @@
   components:
   - type: DynamicRuleset
     nameLoc: dynamic-gamerule-ratking-title
-    weight: 4
-    cost: 5
+    weight: 10
+    cost: 7
     highImpact: true
   - type: StationEvent
     startAnnouncement: station-event-vent-creatures-start-announcement
