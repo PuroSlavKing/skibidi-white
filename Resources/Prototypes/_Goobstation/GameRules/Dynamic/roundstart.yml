@@ -25,8 +25,8 @@
   - type: AntagSelection
     definitions:
     - prefRoles: [ Traitor ]
-      max: 2
-      playerRatio: 30
+      max: 1
+      playerRatio: 10
       blacklist:
         components:
         - AntagImmune
@@ -104,7 +104,7 @@
     agentName: thief-round-end-agent-name
     definitions:
     - prefRoles: [ Thief ]
-      max: 2
+      max: 1
       playerRatio: 25
       lateJoinAdditional: true
       allowNonHumans: true
@@ -115,132 +115,6 @@
         prototype: Thief
       briefing:
         sound: "/Audio/Misc/thief_greeting.ogg"
-
-# Changeling - Medium Threat Solo | WWDP-Remove
-#- type: entity
-#  parent: BaseGameRuleDynamic
-#  id: ChangelingDynamicLow
-#  components:
-#  - type: DynamicRuleset
-#    nameLoc: dynamic-gamerule-changeling-low-title
-#    weight: 5
-#    cost: 10
-#    scalingCost: 11
-#  - type: ChangelingRule
-#  - type: GameRule
-#    minPlayers: 40 # 40 required to make the low preset different from high
-#  - type: AntagObjectives
-#    objectives:
-#    - ChangelingStealDNAObjective
-#    - EscapeIdentityObjective
-#    - ChangelingSurviveObjective
-#  - type: AntagSelection
-#    agentName: changeling-roundend-name
-#    definitions:
-#    - prefRoles: [ Changeling ]
-#      max: 2
-#      playerRatio: 30
-#      blacklist:
-#        components:
-#        - AntagImmune
-#        - Traitor
-#        - Heretic
-#      lateJoinAdditional: true
-#      mindRoles:
-#      - MindRoleChangeling
-
-#- type: entity # WWDP-Remove
-#  parent: BaseGameRuleDynamic
-#  id: ChangelingDynamicHigh
-#  components:
-#  - type: DynamicRuleset
-#    nameLoc: dynamic-gamerule-changeling-high-title
-#    weight: 10
-#    cost: 21
-#    scalingCost: 23
-#  - type: ChangelingRule
-#  - type: GameRule
-#    minPlayers: 20 # Changelings are great low pop antags but it doesn't work for dynamic that well :[ 
-#  - type: AntagObjectives
-#    objectives:
-#    - ChangelingStealDNAObjective
-#    - EscapeIdentityObjective
-#    - ChangelingSurviveObjective
-#  - type: AntagSelection
-#    agentName: changeling-roundend-name
-#    definitions:
-#    - prefRoles: [ Changeling ]
-#      max: 4
-#      playerRatio: 20
-3      blacklist:
-#        components:
-#        - AntagImmune
-#        - Traitor
-#        - Heretic
-#      lateJoinAdditional: true
-#      mindRoles:
-#      - MindRoleChangeling
-
-# Heretic - Medium Threat Solo | WWDP-Remove
-#- type: entity
-#  parent: BaseGameRuleDynamic
-#  id: HereticDynamicLow
-#  components:
-#  - type: DynamicRuleset
-#    nameLoc: dynamic-gamerule-heretic-low-title
-#    weight: 5
-#    cost: 12
-#    scalingCost: 13
-#  - type: HereticRule
-#  - type: GameRule
-#    minPlayers: 40
-#  - type: AntagSelection
-#    agentName: heretic-roundend-name
-#    definitions:
-#    - prefRoles: [ Heretic ]
-#      max: 2
-#      playerRatio: 30
-#      blacklist:
-#        components:
-#        - AntagImmune
-#      lateJoinAdditional: true
-#      mindRoles:
-#      - MindRoleHeretic
-#  - type: AntagObjectives
-#    objectives:
-#    - HereticKnowledgeObjective
-#    - HereticSacrificeObjective
-#    - HereticSacrificeHeadObjective
-
-#- type: entity # WWDP-Remove
-#  parent: BaseGameRuleDynamic
-#  id: HereticDynamicHigh
-#  components:
-#  - type: DynamicRuleset
-#    nameLoc: dynamic-gamerule-heretic-high-title
-#    weight: 10
-#    cost: 24
-#    scalingCost: 26
-#  - type: HereticRule
-#  - type: GameRule
-#    minPlayers: 20
-#  - type: AntagSelection
-#    agentName: heretic-roundend-name
-#    definitions:
-#    - prefRoles: [ Heretic ]
-#      max: 4
-#      playerRatio: 20
-#      blacklist:
-#        components:
-#        - AntagImmune
-#      lateJoinAdditional: true
-#      mindRoles:
-#      - MindRoleHeretic
-#  - type: AntagObjectives
-#    objectives:
-#    - HereticKnowledgeObjective
-#    - HereticSacrificeObjective
-#    - HereticSacrificeHeadObjective
 
 # Revolution
 - type: entity

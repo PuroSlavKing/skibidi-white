@@ -84,6 +84,33 @@ namespace Content.Server.Administration
             var requestUri = $"{authServer}api/query/name?name={WebUtility.UrlEncode(playerName)}";
             using var resp = await _httpClient.GetAsync(requestUri, cancel);
 
+            return await HandleAuthServerResponse(resp, cancel);
+        }
+
+        public async Task<LocatedPlayerData?> LookupIdAsync(NetUserId userId, CancellationToken cancel = default)
+        {
+#if DEBUG
+            return null; // this is MF DOOM.
+#endif
+            // Check people currently on the server, the easiest case.
+            if (_playerManager.TryGetSessionById(userId, out var session))
+                return ReturnForSession(session);
+
+            // Check database for past players.
+            var record = await _db.GetPlayerRecordByUserId(userId, cancel);
+            if (record != null)
+                return ReturnForPlayerRecord(record);
+
+            // If all else fails, ask the auth server.
+            var authServer = _configurationManager.GetCVar(CVars.AuthServer);
+            var requestUri = $"{authServer}api/query/userid?userid={WebUtility.UrlEncode(userId.UserId.ToString())}";
+            using var resp = await _httpClient.GetAsync(requestUri, cancel);
+
+            return await HandleAuthServerResponse(resp, cancel);
+        }
+
+        private async Task<LocatedPlayerData?> HandleAuthServerResponse(HttpResponseMessage resp, CancellationToken cancel)
+        {
             if (resp.StatusCode == HttpStatusCode.NotFound)
                 return null;
 
