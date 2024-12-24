@@ -21,46 +21,18 @@
     duration: null
     occursDuringRoundEnd: false
   - type: AlertLevelInterceptionRule
-
-# Midround Changelings | WWDP-Remove
-#- type: entity
-#  parent: ChangelingDynamicLow
-#  id: ChangelingDynamicMidround
-#  components:
-#  - type: DynamicRuleset
-#    nameLoc: dynamic-gamerule-midround-changeling-title
-#    weight: 15
-#    cost: 12 
-#  - type: StationEvent
-#    earliestStart: 20
-#    weight: 3
-#    minimumPlayers: 15
-#    startAnnouncement: station-event-communication-interception
-#    startAudio:
-#      path: /Audio/Announcements/intercept.ogg
-#    duration: null
-#    occursDuringRoundEnd: false
-#  - type: AlertLevelInterceptionRule
-
-# Midround Heretics | WWDP-Remove
-#- type: entity
-#  parent: HereticDynamicLow
-#  id: HereticDynamicMidround
-#  components:
-#  - type: DynamicRuleset
-#    nameLoc: dynamic-gamerule-midround-heretic-title
-#    weight: 15
-#    cost: 15
-#  - type: StationEvent
-#    earliestStart: 20 
-#    weight: 3 
-#    minimumPlayers: 30
-#    startAnnouncement: station-event-communication-interception
-#    startAudio:
-#      path: /Audio/Announcements/intercept.ogg
-#    duration: null
-#    occursDuringRoundEnd: false
-#  - type: AlertLevelInterceptionRule
+  - type: AntagSelection
+    selectionTime: PostPlayerSpawn
+    definitions:
+    - prefRoles: [ Traitor ]
+      max: 1
+      playerRatio: 10
+      blacklist:
+        components:
+        - AntagImmune
+      lateJoinAdditional: true
+      mindRoles:
+      - MindRoleTraitor
 
 # Midround Revolutionaries
 - type: entity
@@ -79,6 +51,26 @@
     maxOccurrences: 1
     duration: null
     occursDuringRoundEnd: false
+  - type: AntagSelection
+    selectionTime: PostPlayerSpawn
+    definitions:
+    - prefRoles: [ HeadRev ]
+      max: 3
+      playerRatio: 15
+      blacklist:
+        components:
+        - AntagImmune
+        - CommandStaff
+      briefing:
+        text: head-rev-role-greeting
+        color: CornflowerBlue
+        sound: "/Audio/Ambience/Antag/headrev_start.ogg"
+      startingGear: HeadRevGear
+      components:
+      - type: Revolutionary
+      - type: HeadRevolutionary
+      mindRoles:
+      - MindRoleHeadRevolutionary
 
 # Skeleton Spawn
 - type: entity

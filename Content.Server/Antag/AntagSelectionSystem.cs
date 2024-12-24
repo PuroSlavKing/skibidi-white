@@ -204,28 +204,83 @@ public sealed partial class AntagSelectionSystem : GameRuleSystem<AntagSelection
         var playerPool = GetPlayerPool(ent, pool, def);
         var count = GetTargetAntagCount(ent, GetTotalPlayerCount(pool), def);
 
+        // Oh well two different target antag counts. fml
+        var targetCount = ent.Comp.SelectedSessions.Count + count;
+
         // if there is both a spawner and players getting picked, let it fall back to a spawner.
         var noSpawner = def.SpawnerPrototype == null;
-        for (var i = 0; i < count; i++)
+        var picking = def.PickPlayer;
+        if (midround && ent.Comp.SelectionTime == AntagSelectionTime.PrePlayerSpawn)
         {
-            var session = (ICommonSession?) null;
-            if (def.PickPlayer)
-            {
-                if (!playerPool.TryPickAndTake(RobustRandom, out session) && noSpawner)
-                {
-                    Log.Warning($"Couldn't pick a player for {ToPrettyString(ent):rule}, no longer choosing antags for this definition");
-                    break;
-                }
-
-                if (session != null && ent.Comp.SelectedSessions.Contains(session))
-                {
-                    Log.Warning($"Somehow picked {session} for an antag when this rule already selected them previously");
-                    continue;
-                }
-            }
-
-            MakeAntag(ent, session, def);
+            // prevent antag selection from happening if the round is on-going, requiring a spawner if used midround.
+            // this is so rules like nukies, if added by an admin midround, dont make random living people nukies
+            Log.Info($"Antags for rule {ent:?} get picked pre-spawn so only spawners will be made.");
+            DebugTools.Assert(def.SpawnerPrototype != null, $"Rule {ent:?} had no spawner for pre-spawn rule added mid-round!");
+            picking = false;
         }
+
+        ///// Einstein Engines changes /////
+        //
+        // Fixes issues caused by failures in making someone antag while
+        // not breaking any API on this system.
+        //
+        // This will either allocate `count` slots from the player pool,
+        // or will call MakeAntag with null sessions to fill up the slots.
+        //
+        if (def.PickPlayer)
+        {
+            // Tries multiple times to assign antags.
+            // When any number of assignments fail, next iteration
+            // gets new items to replace those.
+            // Already selected or failed sessions are avoided.
+            // It retries until it ends with no failures or up
+            // to maxRetries attempts.
+
+            const int maxRetries = 4;
+            var retry = 0;
+            List<ICommonSession> failed = [];
+
+            while (ent.Comp.SelectedSessions.Count < targetCount && retry < maxRetries)
+            {
+                var sessions = (ICommonSession[]?) null;
+                if (!playerPool.TryGetItems(RobustRandom,
+                                            out sessions,
+                                            targetCount - ent.Comp.SelectedSessions.Count,
+                                            false))
+                    break; // Ends early if there are no eligible sessions
+
+                foreach (var session in sessions)
+                {
+                    MakeAntag(ent, session, def);
+                    if (!ent.Comp.SelectedSessions.Contains(session))
+                    {
+                        failed.Add(session);
+                    }
+                }
+                // In case we're done
+                if (ent.Comp.SelectedSessions.Count >= targetCount)
+                    break;
+
+                playerPool = playerPool.Where((session_) =>
+                {
+                    return !ent.Comp.SelectedSessions.Contains(session_) &&
+                        !failed.Contains(session_);
+                });
+                retry++;
+            }
+        }
+
+        // This preserves previous behavior for when def.PickPlayer
+        // was not satisfied. This behavior is not that obvious to
+        // read from the previous code.
+        // It may otherwise process leftover slots if maxRetries have
+        // been reached.
+
+        for (var i = ent.Comp.SelectedSessions.Count; i < targetCount; i++)
+        {
+            MakeAntag(ent, null, def);
+        }
+        ///// End of Einstein Engines changes /////
     }
 
     /// <summary>
