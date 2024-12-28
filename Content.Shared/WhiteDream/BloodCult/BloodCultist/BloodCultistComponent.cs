@@ -1,5 +1,4 @@
 ﻿using System.Threading;
-using Content.Shared.Antag;
 using Content.Shared.FixedPoint;
 using Content.Shared.Language;
 using Content.Shared.Mind;
@@ -10,7 +9,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared.WhiteDream.BloodCult.BloodCultist;
 
 [RegisterComponent, NetworkedComponent]
-public sealed partial class BloodCultistComponent : Component, IAntagStatusIconComponent
+public sealed partial class BloodCultistComponent : Component
 {
     [DataField]
     public float HolyConvertTime = 15f;
