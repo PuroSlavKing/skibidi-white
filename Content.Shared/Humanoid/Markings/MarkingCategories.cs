@@ -11,6 +11,7 @@ namespace Content.Shared.Humanoid.Markings
         HeadTop,
         HeadSide,
         Snout,
+        Breast, // WWDP
         Chest,
         RightArm,
         RightHand,
@@ -46,6 +47,7 @@ namespace Content.Shared.Humanoid.Markings
                 HumanoidVisualLayers.LFoot => MarkingCategories.LeftFoot,
                 HumanoidVisualLayers.RFoot => MarkingCategories.RightFoot,
                 HumanoidVisualLayers.Tail => MarkingCategories.Tail,
+                HumanoidVisualLayers.Breast => MarkingCategories.Breast, // WWDP
                 _ => MarkingCategories.Overlay
             };
         }

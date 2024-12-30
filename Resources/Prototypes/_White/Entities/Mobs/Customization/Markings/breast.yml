@@ -1,0 +1,17 @@
+- type: marking
+  id: BreastPairMedium
+  bodyPart: Breast
+  markingCategory: Breast
+  speciesRestriction: [Human, Reptilian, Slime, Harpy]
+  sprites:
+  - sprite: _White/Mobs/Customization/breasts.rsi
+    state: breasts_pair_0
+
+- type: marking
+  id: BreastSextupleHuge
+  bodyPart: Breast
+  markingCategory: Breast
+  speciesRestriction: [Human, Reptilian, Slime, Harpy]
+  sprites:
+  - sprite: _White/Mobs/Customization/breasts.rsi
+    state: breasts_sextuple_huge

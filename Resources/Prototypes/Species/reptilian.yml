@@ -23,6 +23,7 @@
   sprites:
     Head: MobReptilianHead
     Snout: MobHumanoidAnyMarking
+    Breast: MobHumanoidAnyMarking # WWDP
     Chest: MobReptilianTorso
     HeadTop: MobHumanoidAnyMarking
     HeadSide: MobHumanoidAnyMarking
@@ -60,6 +61,9 @@
       required: false
     HeadSide:
       points: 2
+      required: false
+    Breast: # WWDP
+      points: 1
       required: false
     Chest:
       points: 3 # WWDP-Edit

@@ -21,6 +21,7 @@
     Hair: MobHumanoidAnyMarking
     FacialHair: MobHumanoidAnyMarking
     Snout: MobHumanoidAnyMarking
+    Breast: MobHumanoidAnyMarking # WWDP
     Chest: MobHarpyTorso
     HeadTop: MobHumanoidAnyMarking
     HeadSide: MobHumanoidAnyMarking
@@ -55,6 +56,9 @@
       defaultMarkings: [ HarpyEarsDefault ]
     HeadSide:
       points: 2
+      required: false
+    Breast: # WWDP
+      points: 1
       required: false
     Chest:
       points: 1

@@ -23,6 +23,7 @@ namespace Content.Shared.Humanoid
         LLeg,
         RFoot,
         LFoot,
+        Breast, // WWDP
         Handcuffs,
         StencilMask,
         Ensnare,

@@ -16,6 +16,7 @@
     HeadSide: MobHumanoidAnyMarking
     Hair: MobSlimeMarkingFollowSkin
     FacialHair: MobSlimeMarkingFollowSkin
+    Breast: MobHumanoidAnyMarking # WWDP
     Chest: MobSlimeTorso
     Eyes: MobHumanoidEyes
     LArm: MobSlimeLArm
@@ -37,6 +38,9 @@
       points: 2
       required: false
     FacialHair:
+      points: 1
+      required: false
+    Breast: # WWDP
       points: 1
       required: false
     Chest:
