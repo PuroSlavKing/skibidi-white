@@ -918,7 +918,7 @@ public sealed partial class ChatSystem : SharedChatSystem
     private IEnumerable<INetChannel> GetXenoChatClients()
     {
         return Filter.Empty()
-            .AddWhereAttachedEntity(HasComp<AlienComponent>)
+            .AddWhereAttachedEntity(HasComp<AlienComponent> or HasComp<GhostComponent>)
             .Recipients
             .Select(p => p.Channel);
     }
